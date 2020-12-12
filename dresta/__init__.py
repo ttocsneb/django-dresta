@@ -25,7 +25,7 @@ from importlib import import_module
 from django.urls import path, include
 from django.apps import apps
 
-from . import find_members, load_app_module
+from .finder import find_members, load_app_module
 
 from typing import List, Tuple
 

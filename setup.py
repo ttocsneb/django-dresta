@@ -20,7 +20,7 @@ INSTALL_REQUIRES = [
 
 setup(
     name="django-dresta",
-    version="0.1.1",
+    version="0.1.2",
 
     description="Django Decorated ReST API",
     long_description=description(),
