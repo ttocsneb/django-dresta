@@ -20,7 +20,7 @@ INSTALL_REQUIRES = [
 
 setup(
     name="django-dresta",
-    version="0.1.0",
+    version="0.1.1",
 
     description="Django Decorated ReST API",
     long_description=description(),
@@ -32,5 +32,6 @@ setup(
     author_email='benjammin1100@gmail.com',
     url='https://github.com/ttocsneb/',
 
-    package=find_packages()
+    packages=find_packages(),
+    include_package_data=True
 )
