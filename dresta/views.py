@@ -17,7 +17,7 @@ from blueweather.utils import JsonEncoder
 from .annotate import annotator
 from . import parser
 
-from .exceptions import APIError, ValidateError
+from .exceptions import APIError, ValidateError, USER_ERROR, SERV_ERROR
 
 
 class Api:
@@ -30,6 +30,8 @@ class Api:
         is not GET
     :param schema: result schema
     :param args_schema: request schema
+    :param auth_required: whether you need to be authenticated to access the
+        api
     """
     def __init__(self, **kwargs):
         self.func: callable = kwargs.pop('func')
@@ -38,6 +40,7 @@ class Api:
         self.allow_get_params: bool = kwargs.pop('allow_get_params', True)
         self.args_schema: Type[Schema] = kwargs.pop('args_schema', None)
         self.schema: Optional[Type[Schema]] = kwargs.pop('schema', None)
+        self.auth_required: bool = kwargs.pop('auth_required', False)
         self._name: Optional[str] = kwargs.pop('name', None)
 
         self.logger = logging.getLogger(__name__)
@@ -104,8 +107,9 @@ class Api:
             # Assert the correct method type
             if self.methods is not None and request.method not in self.methods:
                 apiError = APIError(
-                    405,
-                    detail="Method Not Allowed"
+                    USER_ERROR | 2,
+                    detail="Method Not Allowed",
+                    methods=self.methods
                 )
                 return self._api_error(request, apiError)
 
@@ -123,6 +127,7 @@ class Api:
                     params = self._merge(post, params)
                 except json.JSONDecodeError as error:
                     apiError = APIError(
+                        USER_ERROR | 3,
                         detail="Invalid Json",
                         error=str(error)
                     )
@@ -142,6 +147,15 @@ class Api:
                 )
                 return self._api_error(request, apiError)
 
+            if self.auth_required:
+                # Assert authentication
+                if not request.user.is_authenticated:
+                    apiError = APIError(
+                        USER_ERROR | 4,
+                        "Authentication required."
+                    )
+                    raise self._api_error(request, apiError)
+
             # Run the api
             try:
                 result = self.func(*bound.args, **bound.kwargs)
@@ -160,7 +174,7 @@ class Api:
         except Exception:
             self.logger.exception("Internal Error")
             apiError = APIError(
-                code=500,
+                code=SERV_ERROR,
                 detail="Internal Error"
             )
             return self._api_error(request, apiError)

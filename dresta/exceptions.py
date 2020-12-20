@@ -7,11 +7,19 @@ from django.http.response import JsonResponse
 from marshmallow import ValidationError
 
 
+USER_ERROR = 0b0001_0000
+'''An error caused by the user.'''
+SERV_ERROR = 0b0010_0000
+'''An error caused by the server.'''
+VALI_ERROR = 0b0100_0000
+'''An error that involves validation.'''
+
+
 class APIError(Exception):
     """
     The base exception for all api exceptions
     """
-    def __init__(self, code: int = 400, detail: str = "API Error", **kwargs):
+    def __init__(self, code: int, detail: str = "API Error", **kwargs):
         self.code = code
         self.detail = detail
         self.details = kwargs
@@ -40,7 +48,9 @@ class NotFoundError(APIError):
     """
     An error when something was not found
     """
-    def __init__(self, code: int = 404, detail: str = "Not Found Error", **kwargs):
+    NOT_FOUND = USER_ERROR | 1
+
+    def __init__(self, code: int = NOT_FOUND, detail: str = "Not Found Error", **kwargs):
         super().__init__(code, detail, **kwargs)
 
 
@@ -48,7 +58,9 @@ class ValidateError(APIError):
     """
     An error when something could not be validated
     """
-    def __init__(self, validation: list, code: int = 400, detail: str = "Validation Error", **kwargs):
+    NOT_FOUND = VALI_ERROR | 2
+
+    def __init__(self, validation: list, code: int = NOT_FOUND, detail: str = "Validation Error", **kwargs):
         super().__init__(code, detail, validation=validation, **kwargs)
 
     @classmethod
