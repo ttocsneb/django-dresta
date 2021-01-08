@@ -1,3 +1,5 @@
+import logging
+
 import importlib
 import inspect
 
@@ -18,7 +20,9 @@ def load_app_module(app: AppConfig, module: str):
     relative = '.%s' % module
     try:
         return importlib.import_module(relative, package=app.name)
-    except ImportError:
+    except ImportError as err:
+        if str(err) != "No module named '%s'" % (app.name + relative):
+            logging.getLogger(__name__).exception("Could not import API Module")
         return None
 
 

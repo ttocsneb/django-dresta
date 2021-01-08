@@ -55,6 +55,7 @@ def include_api_patterns(module):
     members = find_members(module)
 
     # Get all members that have the 'urlpattern' attr (it is an api view)
+
     views = [
         member
         for member in members

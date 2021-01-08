@@ -1,5 +1,9 @@
 import math
 
+import datetime
+
+import json
+
 from typing import List, Any
 
 
@@ -37,3 +41,18 @@ def pagify(data: List[Any], page: int, size: int, name: str = 'data') -> dict:
         'pages': pages,
         'total': total
     }
+
+
+class JsonEncoder(json.encoder.JSONEncoder):
+    """
+    A JsonEncoder that handles stringlikes
+    """
+    def default(self, obj):
+
+        if isinstance(obj, (datetime.datetime, datetime.date, datetime.time)):
+            return str(obj)
+
+        if hasattr(obj, 'toDict'):
+            return self.default(obj.toDict())
+
+        return super().default(obj)

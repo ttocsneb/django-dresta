@@ -10,7 +10,7 @@ from marshmallow import Schema
 from typing import Optional, List, Type
 
 
-def api(*,
+def api(name: str = None, *,
         methods: Optional[List[str]] = None,
         allow_get_params: bool = True,
         auth_required: bool = False,
@@ -35,7 +35,8 @@ def api(*,
             allow_get_params=allow_get_params,
             auth_required=auth_required,
             args_schema=args_schema,
-            schema=schema
+            schema=schema,
+            name=name
         )
         return update_wrapper(obj, func)
 

@@ -12,7 +12,7 @@ from django.http.response import JsonResponse
 from django.utils.log import log_response
 from django.urls import path
 
-from blueweather.utils import JsonEncoder
+from .utils import JsonEncoder
 
 from .annotate import annotator
 from . import parser
